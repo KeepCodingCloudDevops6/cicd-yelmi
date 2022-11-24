@@ -1,0 +1,54 @@
+pipeline {
+    agent {
+        label('terraform')
+    }
+
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('aws-credentials')
+        AWS_REGION = "us-east-1"
+    }
+    
+    options { 
+        disableConcurrentBuilds()
+        ansiColor('xterm')
+        timeout(time: 10, unit: 'MINUTES')
+    }
+    stages {
+        stage('terraform init') {
+            steps {
+                dir('terraform') {
+                    sh 'terraform init'
+                }
+            }
+        }
+        stage('terraform plan') {
+            steps {
+                dir('terraform') {
+                    sh 'terraform plan'
+                }
+            }
+        }
+        stage('terraform apply') {
+             input {
+                 message "Do you want to continue?"
+                 ok "Yes, continue the pipeline"
+             }
+             when {
+                branch 'main'
+             }
+            steps {
+                dir('terraform') {
+                    sh 'terraform apply --auto-approve'
+                }
+            }
+        }        
+    }  
+        post {
+            failure {
+                echo "The pipeline failed please contact the administrator"
+            }
+            success {
+                echo "The pipeline had been successfull"
+            }
+    }
+}

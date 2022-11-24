@@ -1,0 +1,24 @@
+pipeline {
+    agent {
+        label('terraform')
+    }
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('aws-credentials')
+    }
+    triggers {
+        cron('*/10 * * * *')
+    }
+    options {
+        disableConcurrentBuilds()
+        timeout(time: 1, unit: 'MINUTES')
+    }
+    stages {
+        stage('Check') {
+            steps {
+                dir('size-pipeline') {
+                    sh 'sh check.sh'
+                }
+            }
+        }
+    }
+}
