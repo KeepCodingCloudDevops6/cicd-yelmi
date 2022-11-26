@@ -1,0 +1,23 @@
+multibranchPipelineJob('terraform') {
+    branchSources {
+        git {
+           id('1')
+            remote('git@github.com:KeepCodingCloudDevops6/cicd-yelmi.git')
+          	credentialsId('git-ssh')
+        }
+    }
+}
+multibranchPipelineJob('size') {
+    branchSources {
+        git {
+           id('2')
+            remote(' git@github.com:KeepCodingCloudDevops6/cicd-yelmi.git')
+          	credentialsId('git-ssh')
+        }
+    }
+    factory {
+      	workflowBranchProjectFactory {
+  			scriptPath('size-pipeline/Jenkinsfile')
+    	}
+	}
+}
